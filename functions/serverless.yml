@@ -1,0 +1,48 @@
+service: split
+plugins:
+  - print
+
+custom:
+  resourcesYml: ${file(../resources/serverless.yml)}
+  resourcesStackName: ${self:custom.resourcesYml.service}-${opt:stage, self:provider.stage}
+  resources:
+    bucket1:
+      Fn::ImportValue: '${self:custom.resourcesStackName}-bucket1'
+    table1:
+      Fn::ImportValue: '${self:custom.resourcesStackName}-table1'
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: dev
+  environment:
+    bucket1: ${self:custom.resources.bucket1}
+    table1: ${self:custom.resources.table1}
+
+  iamRoleStatements: # IAM role statements so that services can be accessed in the AWS account
+    - Effect: Allow
+      Action:
+        - 's3:*'
+      Resource:
+        - Fn::ImportValue: '${self:custom.resourcesStackName}-bucket1'
+        # - ${self:custom.resources.bucket1}
+        # - ${self:custom.resources.bucket1}/*
+    - Effect: Allow
+      Action:
+        - 'dynamodb:*'
+      Resource:
+        - Fn::ImportValue: '${self:custom.resourcesStackName}-table1'
+        # - ${self:custom.resources.table1}
+        # - ${self:custom.resources.table1}/*
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: /
+          method: ANY
+      - http:
+          # match all paths, the token 'any' doesn't mean anything special
+          path: /{any+}
+          method: ANY

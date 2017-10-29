@@ -1,0 +1,23 @@
+{
+  "name": "serverless-split",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "dependencies": {
+    "serverless-pseudo-parameters": "^1.2.5"
+  },
+  "devDependencies": {
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "serverless": "^1.23.0"
+  },
+  "scripts": {
+    "deploy:resources": "cd resources && serverless deploy",
+    "deploy:functions": "cd functions && serverless deploy",
+    "lint": "eslint --quiet --ignore-path .gitignore ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,47 @@
+service: split-resources
+# plugins:
+#   - serverless-pseudo-parameters
+
+provider:
+  name: aws
+  stage: dev
+  runtime: nodejs6.10
+
+resources:
+  Resources:
+    bucket1:
+      Type: 'AWS::S3::Bucket'
+    table1:
+      Type: 'AWS::DynamoDB::Table'
+      Description: table 1
+      Properties:
+        TableName: table1
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+  Outputs:
+    bucket1:
+      Description: content-addressed storage for all objects
+      Value:
+        Fn::GetAtt: [bucket1, Arn]
+      Export:
+        Name: ${self:service}-${self:provider.stage}-bucket1
+    table1:
+      Description: table 1
+      Value:
+        Fn::GetAtt: [table1, Arn]
+      Export:
+        Name: ${self:service}-${self:provider.stage}-table1
+
+  # ResourcesStack:
+  #   Value:
+  #     Ref: 'AWS::StackId'
+  #     Export:
+  #       Name: Fn::Sub "#{AWS::StackName}-bucket1"
