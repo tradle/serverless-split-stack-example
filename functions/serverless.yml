@@ -1,15 +1,26 @@
 service: split
 plugins:
   - print
+  - serverless-pseudo-parameters
 
 custom:
   resourcesYml: ${file(../resources/serverless.yml)}
   resourcesStackName: ${self:custom.resourcesYml.service}-${opt:stage, self:provider.stage}
   resources:
     bucket1:
-      Fn::ImportValue: '${self:custom.resourcesStackName}-bucket1'
+      Fn::ImportValue: ${self:custom.resourcesStackName}-bucket1
     table1:
-      Fn::ImportValue: '${self:custom.resourcesStackName}-table1'
+      Fn::ImportValue: ${self:custom.resourcesStackName}-table1
+    bucket1Arn:
+      Fn::Join:
+        - ''
+        - - 'arn:aws:s3:::'
+          - Fn::ImportValue: '${self:custom.resourcesStackName}-bucket1'
+    table1Arn:
+      Fn::Join:
+        - ''
+        - - 'arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/'
+          - Fn::ImportValue: '${self:custom.resourcesStackName}-table1'
 
 provider:
   name: aws
@@ -24,16 +35,20 @@ provider:
       Action:
         - 's3:*'
       Resource:
-        - Fn::ImportValue: '${self:custom.resourcesStackName}-bucket1'
-        # - ${self:custom.resources.bucket1}
-        # - ${self:custom.resources.bucket1}/*
+        - ${self:custom.resources.bucket1Arn}
+        - Fn::Join:
+          - ""
+          - - ${self:custom.resources.bucket1Arn}
+            - '/*'
     - Effect: Allow
       Action:
         - 'dynamodb:*'
       Resource:
-        - Fn::ImportValue: '${self:custom.resourcesStackName}-table1'
-        # - ${self:custom.resources.table1}
-        # - ${self:custom.resources.table1}/*
+        - ${self:custom.resources.table1Arn}
+        - Fn::Join:
+          - ""
+          - - ${self:custom.resources.table1Arn}
+            - '/*'
 
 functions:
   hello:

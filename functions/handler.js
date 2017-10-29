@@ -12,14 +12,16 @@ module.exports.hello = (event, context, callback) => {
     },
   }
 
-  // s3.listObjects({
-  //   Bucket: process.env.bucket1.split(':').pop()
-  // })
-
-  db.scan({
-    TableName: process.env.table1.split(':').pop()
-  })
-  .promise()
+  Promise.all([
+    s3.listObjects({
+      Bucket: process.env.bucket1
+    })
+    .promise(),
+    db.scan({
+      TableName: process.env.table1
+    })
+    .promise()
+  ])
   .then(result => {
     response.result = result
   }, err => {

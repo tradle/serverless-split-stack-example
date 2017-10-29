@@ -28,15 +28,15 @@ resources:
 
   Outputs:
     bucket1:
-      Description: content-addressed storage for all objects
+      Description: some bucket 1
       Value:
-        Fn::GetAtt: [bucket1, Arn]
+        Ref: bucket1
       Export:
         Name: ${self:service}-${self:provider.stage}-bucket1
     table1:
       Description: table 1
       Value:
-        Fn::GetAtt: [table1, Arn]
+        Ref: table1
       Export:
         Name: ${self:service}-${self:provider.stage}-table1
 
