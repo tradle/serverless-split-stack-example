@@ -1,11 +1,17 @@
 service: split-resources
-# plugins:
-#   - serverless-pseudo-parameters
+plugins:
+  - print
+  # - serverless-pseudo-parameters
+
+custom:
+  stage: dev
+  prefix: ${self:service}-${self:provider.stage}-
 
 provider:
   name: aws
-  stage: dev
+  stage: ${self:custom.stage}
   runtime: nodejs6.10
+  # variableSyntax: "\\${{([ ~:a-zA-Z0-9._\\'\",\\-\\/\\(\\)]+?)}}"
 
 resources:
   Resources:
@@ -15,7 +21,7 @@ resources:
       Type: 'AWS::DynamoDB::Table'
       Description: table 1
       Properties:
-        TableName: table1
+        TableName: ${self:custom.prefix}table1
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
@@ -32,13 +38,17 @@ resources:
       Value:
         Ref: bucket1
       Export:
-        Name: ${self:service}-${self:provider.stage}-bucket1
+        # Name:
+        #   Fn::Sub: '${AWS::StackName}-bucket1'
+        Name: ${self:custom.prefix}bucket1
     table1:
       Description: table 1
       Value:
         Ref: table1
       Export:
-        Name: ${self:service}-${self:provider.stage}-table1
+        # Name:
+        #   Fn::Sub: '${AWS::StackName}-table1'
+        Name: ${self:custom.prefix}table1
 
   # ResourcesStack:
   #   Value:

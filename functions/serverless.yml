@@ -4,8 +4,8 @@ plugins:
   - serverless-pseudo-parameters
 
 custom:
-  resourcesYml: ${file(../resources/serverless.yml)}
-  resourcesStackName: ${self:custom.resourcesYml.service}-${opt:stage, self:provider.stage}
+  # resourcesYml: ${file(../resources/serverless.yml)}
+  resourcesStackName: ${self:service}-resources-${opt:stage, self:provider.stage}
   resources:
     bucket1:
       Fn::ImportValue: ${self:custom.resourcesStackName}-bucket1
